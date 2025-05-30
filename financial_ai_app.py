@@ -149,7 +149,7 @@ def load_financial_data():
         return create_sample_data()
 
 def clean_financial_data(df):
-    """FIXED: Just clean the data, keep percentages as percentages"""
+    """PROPERLY FIXED: Convert decimal percentages to actual percentages"""
     # Clean column names
     df.columns = df.columns.str.strip()
     
@@ -157,7 +157,7 @@ def clean_financial_data(df):
     percentage_columns = ['Gross Margin', 'Net Profit Margin', 'ROA', 'ROE', 'Debt-to-Assets']
     ratio_columns = ['Current Ratio', 'Debt-to-Equity']
     
-    # Clean percentage columns - keep them as percentages!
+    # Clean percentage columns and convert decimals to percentages
     for col in percentage_columns:
         if col in df.columns:
             # Clean strings (remove % signs, commas, spaces)
@@ -167,9 +167,9 @@ def clean_financial_data(df):
             # Convert to numeric
             df[col] = pd.to_numeric(df[col], errors='coerce')
             
-            # If values are between 0-1, they're decimals - convert to percentages
-            if df[col].max() <= 1 and df[col].max() > 0:
-                df[col] = df[col] * 100
+            # ALWAYS convert to percentage format (multiply by 100) for these columns
+            # because your data comes as decimals (0.334 should be 33.4%)
+            df[col] = df[col] * 100
     
     # Clean ratio columns
     for col in ratio_columns:
